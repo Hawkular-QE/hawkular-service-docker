@@ -1,4 +1,5 @@
-. build-env
+#!/bin/bash
+source ./build-env
 echo "## build-env ##"
 cat build-env
 echo "##"

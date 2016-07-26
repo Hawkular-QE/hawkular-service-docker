@@ -1,0 +1,5 @@
+HAWKULAR_USERNAME=jdoe
+HAWKULAR_PASSWORD=password
+AGENT_ENABLED=true
+HAWKULAR_HOME=/opt/jboss/hawkular-live
+

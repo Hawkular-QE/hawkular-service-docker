@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: hawkular
+metadata:
+  annotations:
+    description: Hawkular-Services all-in-one instant app 
+    iconClass: icon-app-code
+    tags: instant-app,quickstart,wildfly,hawkular,manageiq
+  name: hawkular
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Exposes and load balances the application pods
+    name: ${NAME}
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: ${NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Cassandra Thrift client
+    name: ${NAME}-thrift
+  spec:
+    ports:
+    - name: thrift
+      port: 9160
+      targetPort: 9160
+    selector:
+      name: ${NAME}-cassandra
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ${NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${NAME}
+    port:
+      targetPort: http
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      description: Defines how to deploy the application server
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${NAME}
+    strategy:
+      type: Rolling
+      rollingParams:
+         timeoutSeconds: 480
+    template:
+      metadata:
+        labels:
+          name: ${NAME}
+        name: ${NAME}
+      spec:
+       containers:
+        - image: docker.io/hawkularqe/hawkular-services:latest
+          name: ${NAME}
+          ports:
+          - containerPort: 8080
+          env:
+          - 
+            name: TEST_MODE
+            value: ${TEST_MODE}
+          -
+            name: CASSANDRA_NODES
+            value: localhost
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 120
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+        - image: docker.io/hawkularqe/cassandra:3.7
+          command: [ "cassandra", "-R", "-f" ]
+          name: ${NAME}-cassandra
+          ports:
+          - containerPort: 9042
+          - containerPort: 9160
+          env:
+          -
+            name: CASSANDRA_START_RPC
+            value: "true"
+          resources:
+            limits:
+              memory: ${CASS_MEMORY_LIMIT}
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: hawkular
+- description: Maximum amount of memory for Hawkular container
+  displayName: Hawkular Memory Limit
+  name: MEMORY_LIMIT
+  value: 1Gi
+- description: Maximum amount of memory for Cassandra container
+  displayName: Cassandra Memory Limit
+  name: CASS_MEMORY_LIMIT
+  value: 8Gi
+- description: Enable jdoe test account
+  displayName: TEST_MODE
+  name: TEST_MODE
+  value: "true"
+  required: true

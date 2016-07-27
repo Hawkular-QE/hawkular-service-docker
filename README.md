@@ -1,12 +1,13 @@
-# About
-Docker test build for [Hawkular-Services](https://github.com/hawkular/hawkular-services)
+# Description
+Docker test image of [Hawkular-Services](https://github.com/hawkular/hawkular-services)
 
-## How to Run
-Start Cassandra storage (required)
+# How to Run
+## Plain Docker
+Cassandra storage (required)
 ```
 docker run -d --name myCassandra -e CASSANDRA_START_RPC=true cassandra:3.7
 ```
-Start Hawkular-Services
+Hawkular-Services
 ```
 docker run -d \
   -e TEST_MODE=true
@@ -17,6 +18,19 @@ docker run -d \
 ```
 `TEST_MODE=true` enables `jdoe` test account
 
-## More on the build 
+## OpenShift v3
+- Create an instant app in your namespace
+
+```
+oc new-app --file=openshift/hawk-services-template.yaml
+```
+
+- Optionally you can upload the template to `openshift` namespace to make it available globally and use the UI to create new app
+```
+oc create -f openshift/hawk-services-template.yaml -n openshift
+```
+---
+
+# More on the build 
 - The build script downloads Hawkular-Services release .zip from [maven repo](http://central.maven.org/maven2/org/hawkular/services/hawkular-services-dist/)
 - Add the zip file and configure hawkular-services in Dockerfile

@@ -3,11 +3,16 @@ source ./build-env
 echo "## build-env ##"
 cat build-env
 echo "##"
-rm -rf output/* &&\
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.10:get\
+rm -rf output/* 
+
+if [ "$USE_REMOTE_REPO" = "yes" ]; then
+  echo "Use remote repo"
+  mvn org.apache.maven.plugins:maven-dependency-plugin:2.10:get\
   -DremoteRepositories=${REPO_URL}\
   -Dartifact=${ARTIFACT}\
-  -Dtransitive=false &&\
+  -Dtransitive=false 
+fi
+
 mvn org.apache.maven.plugins:maven-dependency-plugin:2.10:copy\
   -Dartifact="${ARTIFACT}"\
   -DoutputDirectory=output\

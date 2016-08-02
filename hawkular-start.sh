@@ -15,12 +15,12 @@ if [ !  -z "${CASSANDRA_NODES}" ]; then
    export HAWKULAR_BACKEND=remote
 elif [ ! -z "${CASSANDRA_SERVICE}" ]; then
    echo " ## Using Kubernetes-style named service"
-   eval "s=${CASSANDRA_SERVICE}_SERVICE_HOST"
+   eval "s=${CASSANDRA_SERVICE^^}_SERVICE_HOST"
    export CASSANDRA_NODES=${!s}
    HAWKULAR_BACKEND=remote
 fi
 
-echo ${CASSANDRA_NODES}
+echo "CASSANDRA_NODES='${CASSANDRA_NODES}'"
 
 ${HAWKULAR_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 \
   -Dhawkular.rest.user="${HAWKULAR_USERNAME}" \

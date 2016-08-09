@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: hawkular
+  template: hawkular-full
 metadata:
   annotations:
     description: Hawkular-Services all-in-one instant app 
     iconClass: icon-app-code
     tags: instant-app,quickstart,wildfly,hawkular,manageiq
-  name: hawkular
+  name: hawkular-full
 objects:
 - apiVersion: v1
   kind: Service
@@ -34,7 +34,20 @@ objects:
       port: 9160
       targetPort: 9160
     selector:
-      name: ${NAME}-cassandra
+      name: ${NAME}-cnode
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Cassandra CQL
+    name: ${NAME}-cql
+  spec:
+    ports:
+    - name: cql
+      port: 9042
+      targetPort: 9042
+    selector:
+      name: ${NAME}-cnode
 - apiVersion: v1
   kind: Route
   metadata:
@@ -77,22 +90,20 @@ objects:
           -
             name: CASSANDRA_NODES
             value: localhost
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 30
+          -
+            name: DB_TIMEOUT
+            value: ${DB_TIMEOUT}
           livenessProbe:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 360
           resources:
             limits:
               memory: ${MEMORY_LIMIT}
         - image: docker.io/hawkularqe/cassandra:3.7
-          command: [ "cassandra", "-R", "-f" ]
-          name: ${NAME}-cassandra
+          args: ["-R", "-f" ]
+          name: ${NAME}-cnode
           ports:
           - containerPort: 9042
           - containerPort: 9160
@@ -100,6 +111,14 @@ objects:
           -
             name: CASSANDRA_START_RPC
             value: "true"
+          livenessProbe:
+            exec:
+              command: ['nodetool status']
+            initialDelaySeconds: 300
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
           resources:
             limits:
               memory: ${CASS_MEMORY_LIMIT}
@@ -108,11 +127,11 @@ parameters:
   displayName: Name
   name: NAME
   required: true
-  value: hawkular
+  value: hawkular-full
 - description: Maximum amount of memory for Hawkular container
   displayName: Hawkular Memory Limit
   name: MEMORY_LIMIT
-  value: 1Gi
+  value: 2Gi
 - description: Maximum amount of memory for Cassandra container
   displayName: Cassandra Memory Limit
   name: CASS_MEMORY_LIMIT
@@ -121,4 +140,9 @@ parameters:
   displayName: TEST_MODE
   name: TEST_MODE
   value: "true"
+  required: true
+- description: How long Hawkular container should wait for Cassandra before timing out
+  displayName: DB_TIMEOUT
+  name: DB_TIMEOUT
+  value: "300"
   required: true

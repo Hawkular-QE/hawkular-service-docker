@@ -22,6 +22,20 @@ fi
 
 echo ${CASSANDRA_NODES}
 
+if [ ! -z ${DB_TIMEOUT} ]; then
+  echo "Waiting for DB (timeout=${DB_TIMEOUT})"
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  timeout ${DB_TIMEOUT} ${DIR}/check-cnode.sh ${CASSANDRA_NODES}
+  status=$?
+  if [[ $status -eq 124 ]]; then
+    echo "DB timed out"
+    exit $?
+  fi
+  if [ ! $status ]; then
+    exit 1
+  fi
+fi
+
 ${HAWKULAR_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 \
   -Dhawkular.rest.user="${HAWKULAR_USERNAME}" \
   -Dhawkular.rest.password="${HAWKULAR_PASSWORD}" \

@@ -1,3 +1,5 @@
+[![Build Status](http://jenkins.cloud1.hawkular.org/job/Build-Hawkular-Services-Docker-from-Maven/badge/icon)](http://jenkins.cloud1.hawkular.org/job/Build-Hawkular-Services-Docker-from-Maven)
+
 # Description
 Docker test image of [Hawkular-Services](https://github.com/hawkular/hawkular-services)
 
@@ -16,18 +18,22 @@ docker run -d \
   --link myCassandra:myCassandra 
   hawkularqe/hawkular-services-docker
 ```
-`TEST_MODE=true` enables `jdoe` test account
+
+### Enviroment variables
+
+- `TEST_MODE=true|false`: enable `jdoe` test account
+- `DB_TIMEOUT=<n>`: if present Hawkular container will wait for Cassandra by polling port 9016 until timeout (in seconds) is lapsed
 
 ## OpenShift v3
 - Create an instant app in your namespace
 
 ```
-oc new-app --file=openshift/hawk-services-template.yaml
+oc new-app --file=openshift/all-in-one-template.yaml
 ```
 
 - Optionally you can upload the template to `openshift` namespace to make it available globally and use the UI to create new app
 ```
-oc create -f openshift/hawk-services-template.yaml -n openshift
+oc create -f openshift/all-in-one-template.yaml -n openshift
 ```
 ---
 

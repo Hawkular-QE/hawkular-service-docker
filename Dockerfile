@@ -7,6 +7,7 @@ WORKDIR ${JBOSS_BASE}
 ADD build-env runtime-env \
     output/hawkular-services-dist.zip \
     hawkular-install.sh \
+    check-cnode.sh \
     hawkular-start.sh ${JBOSS_BASE}/
 
 USER root

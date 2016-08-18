@@ -12,10 +12,11 @@ docker run -d --name myCassandra -e CASSANDRA_START_RPC=true cassandra:3.7
 Hawkular-Services
 ```
 docker run -d \
-  -e TEST_MODE=true
+  -e TEST_MODE=true \
+  - e DB_TIMEOUT=180 \
   -e CASSANDRA_NODES=myCassandra \
   -p 8080:8080 -p 8443:8443 \
-  --link myCassandra:myCassandra 
+  --link myCassandra:myCassandra \
   hawkularqe/hawkular-services-docker
 ```
 

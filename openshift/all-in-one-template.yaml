@@ -80,6 +80,7 @@ objects:
       spec:
        containers:
         - image: docker.io/hawkularqe/hawkular-services:latest
+          imagePullPolicy: Always
           name: ${NAME}
           ports:
           - containerPort: 8080
@@ -97,13 +98,21 @@ objects:
             httpGet:
               path: /
               port: 8080
+            initialDelaySeconds: 420
+          readinessProbe:
+            httpGet:
+              path: /hawkular/status
+              port: 8080
             initialDelaySeconds: 360
           resources:
             limits:
               memory: ${MEMORY_LIMIT}
-        - image: docker.io/hawkularqe/cassandra:3.7
-          args: ["-R", "-f" ]
+        - image: docker.io/hawkularqe/cassandra:latest
+          imagePullPolicy: Always
           name: ${NAME}-cnode
+          volumeMounts:
+          - name: cassandra
+            mountPath: /var/lib/cassandra
           ports:
           - containerPort: 9042
           - containerPort: 9160
@@ -111,17 +120,32 @@ objects:
           -
             name: CASSANDRA_START_RPC
             value: "true"
+          -
+            name: MAX_HEAP_SIZE
+            value: "1024M"
+          readinessProbe:
+            exec:
+              command: ['nodetool', 'status']
+            initialDelaySeconds: 120
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
           livenessProbe:
             exec:
-              command: ['nodetool status']
+              command: ['nodetool', 'status']
             initialDelaySeconds: 300
-            timeoutSeconds: 5
-            periodSeconds: 10
+            timeoutSeconds: 10
+            periodSeconds: 15
             successThreshold: 1
             failureThreshold: 3
           resources:
             limits:
               memory: ${CASS_MEMORY_LIMIT}
+       volumes:
+       - name: cassandra
+         emptyDir: 
+         medium: "Memory"
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   displayName: Name
@@ -135,7 +159,7 @@ parameters:
 - description: Maximum amount of memory for Cassandra container
   displayName: Cassandra Memory Limit
   name: CASS_MEMORY_LIMIT
-  value: 8Gi
+  value: 2Gi
 - description: Enable jdoe test account
   displayName: TEST_MODE
   name: TEST_MODE

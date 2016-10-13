@@ -103,7 +103,10 @@ objects:
             httpGet:
               path: /hawkular/status
               port: 8080
-            initialDelaySeconds: 360
+            initialDelaySeconds: 180
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 12
           resources:
             limits:
               memory: ${MEMORY_LIMIT}

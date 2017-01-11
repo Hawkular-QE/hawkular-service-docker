@@ -17,7 +17,7 @@ docker run -d \
   -e CASSANDRA_NODES=myCassandra \
   -p 8080:8080 -p 8443:8443 \
   --link myCassandra:myCassandra \
-  hawkularqe/hawkular-services-docker
+  hawkularqe/hawkular-services
 ```
 
 ### Enviroment variables

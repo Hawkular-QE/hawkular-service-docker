@@ -1,3 +1,5 @@
+# Attention: This project will be decommissioned soon.  Please visit the official [Hawkular-Services repo](https://github.com/hawkular/hawkular-services)
+ 
 [![Build Status](http://jenkins.cloud1.hawkular.org/job/Build-Hawkular-Services-Docker-from-Maven/badge/icon)](http://jenkins.cloud1.hawkular.org/job/Build-Hawkular-Services-Docker-from-Maven)
 
 # Description

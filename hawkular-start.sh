@@ -1,6 +1,10 @@
 : ${JBOSS_BASE:=/opt/jboss}
 . ${JBOSS_BASE}/runtime-env
 
+if [ -z ${METRICS_ADMIN_TOKEN} ]; then
+   echo "Warning: METRICS_ADMIN_TOKEN env not defined."
+fi
+
 if [ "${TEST_MODE}" == "true" ]; then
    echo " ## Test mode detected ##"
    "${HAWKULAR_HOME}/bin/add-user.sh" \
@@ -41,5 +45,6 @@ ${HAWKULAR_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 \
   -Dhawkular.rest.password="${HAWKULAR_PASSWORD}" \
   -Dhawkular.agent.enabled="${AGENT_ENABLED}" \
   -Djboss.server.data.dir=/var/hawkular-data \
+  -Dorg.hawkular.metrics.admin.token=${METRICS_ADMIN_TOKEN}
 
 exit $?

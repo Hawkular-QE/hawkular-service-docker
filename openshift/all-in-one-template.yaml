@@ -89,6 +89,9 @@ objects:
             name: TEST_MODE
             value: ${TEST_MODE}
           -
+            name: METRICS_ADMIN_TOKEN
+            value: ${METRICS_ADMIN_TOKEN}
+          -
             name: CASSANDRA_NODES
             value: localhost
           -
@@ -167,6 +170,11 @@ parameters:
   displayName: TEST_MODE
   name: TEST_MODE
   value: "true"
+  required: true
+- description: Metrics Admin token
+  displayName: METRICS_ADMIN_TOKEN
+  name: METRICS_ADMIN_TOKEN
+  value: "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg="
   required: true
 - description: How long Hawkular container should wait for Cassandra before timing out
   displayName: DB_TIMEOUT
